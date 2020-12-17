@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">FintecimalChallenge</string>
+    <string name="detail_fragment_name">Detalle</string>
+
+    <string name="greeting_text_bold">Hola Usuario,</string>
+    <string name="greeting_text_normal"> buenos dias!</string>
+    <string name="search_visit_hint">Busca una visita</string>
+    <string name="daily_visits_template">Tienes %1$d visitas en el dia</string>
+    <string name="indicator_legend">Imagen que indica si la colonia fue visitada</string>
+    <string name="navigate_button">Navegar</string>
+    <string name="visit_button">Realizar visita</string>
+    <string name="visited_text">Visitada</string>
+    <string name="pending_text">Pendiente</string>
+
+</resources>
