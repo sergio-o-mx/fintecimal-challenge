@@ -35,7 +35,7 @@ class DetailsFragment : Fragment(), OnMapReadyCallback {
         detailsBinding.mapPlaces.onCreate(savedInstanceState)
         detailsBinding.mapPlaces.getMapAsync(this)
         placeId = DetailsFragmentArgs.fromBundle(requireArguments()).id
-        setupPlaceObserver()
+        setupUIManagerObserver()
         return detailsBinding.root
     }
 
@@ -54,20 +54,34 @@ class DetailsFragment : Fragment(), OnMapReadyCallback {
         placesMap = googleMap
     }
 
-    private fun setupPlaceObserver() {
+    private fun setupUIManagerObserver() {
         detailsViewModel.place.observe(viewLifecycleOwner, {
-            val placeLocation = LatLng(it.entryLocation.latitude, it.entryLocation.longitude)
-            val icon = ContextCompat.getDrawable(
-                requireContext(),
-                if (it.isVisited) R.drawable.ic_visited_marker else R.drawable.ic_non_visited_marker
-            )?.let { drawable ->
-                MarkerUtils.getMarkerIcon(drawable)
+            when (it) {
+                DetailsUIStateManager.Loading -> {
+                    detailsBinding.progressBar.visibility = View.VISIBLE
+                }
+                is DetailsUIStateManager.QueryResponse -> {
+                    detailsBinding.progressBar.visibility = View.GONE
+                    val place = it.place
+                    val placeLocation = LatLng(place.entryLocation.latitude, place.entryLocation.longitude)
+                    val icon = ContextCompat.getDrawable(
+                        requireContext(),
+                        if (place.isVisited) R.drawable.ic_visited_marker else R.drawable.ic_non_visited_marker
+                    )?.let { drawable ->
+                        MarkerUtils.getMarkerIcon(drawable)
+                    }
+                    val marker = MarkerOptions().position(placeLocation).icon(icon)
+                    placesMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
+                    placesMap.addMarker(marker)
+                    if (place.isVisited) loadVisitedDialogAndSetupInfo(place)
+                    else loadPendingVisitDialogAndSetupInfo(place)
+                }
+                is DetailsUIStateManager.UpdateResponse -> {
+                    detailsBinding.progressBar.visibility = View.GONE
+                    if (it.updated == 1) requireActivity().onBackPressed()
+                    else Toast.makeText(requireContext(), "", Toast.LENGTH_SHORT).show()
+                }
             }
-            val marker = MarkerOptions().position(placeLocation).icon(icon)
-            placesMap.animateCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
-            placesMap.addMarker(marker)
-            if (it.isVisited) loadVisitedDialogAndSetupInfo(it)
-            else loadPendingVisitDialogAndSetupInfo(it)
         })
     }
 
@@ -81,7 +95,7 @@ class DetailsFragment : Fragment(), OnMapReadyCallback {
             startActivity(googleMapsIntent)
         }
         detailsBinding.pendingVisitDialog.textVisitClickable.setOnClickListener {
-            Toast.makeText(requireContext(), "Visit clicked", Toast.LENGTH_SHORT).show()
+            detailsViewModel.markPlaceAsVisited(place)
         }
     }
 

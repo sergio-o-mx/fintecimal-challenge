@@ -11,25 +11,20 @@ import kotlinx.coroutines.launch
 class DashboardViewModel @ViewModelInject constructor(
     private val dashboardRepository: DashboardRepository
 ) : ViewModel() {
-    private val getPlacesFromLocalStorageSuccessMessage = "Datos obtenidos localmente con exito"
     private var _response = MutableLiveData<DashboardUIStateManager>()
     val response: LiveData<DashboardUIStateManager>
         get() = _response
+    private val getPlacesFromLocalStorageSuccessMessage: String =
+        "Datos obtenidos localmente con exito"
 
-    init {
-        checkIfLocalStorageIsEmpty()
-    }
-
-    private fun checkIfLocalStorageIsEmpty() {
+    fun checkIfLocalStorageIsEmpty() {
         _response.value = DashboardUIStateManager.Loading
         viewModelScope.launch {
             val responseFromLocalStorage = dashboardRepository.getPlacesFromLocalStorage()
             if (responseFromLocalStorage.isEmpty()) {
                 getPlacesFromNetwork()
             } else {
-                _response.postValue(
-                    DashboardUIStateManager.Message(getPlacesFromLocalStorageSuccessMessage)
-                )
+                _response.postValue(DashboardUIStateManager.Message(getPlacesFromLocalStorageSuccessMessage))
                 _response.postValue(DashboardUIStateManager.Response(responseFromLocalStorage))
             }
         }

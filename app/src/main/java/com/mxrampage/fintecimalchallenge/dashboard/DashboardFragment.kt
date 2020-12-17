@@ -23,13 +23,17 @@ class DashboardFragment : Fragment() {
     private val dashboardListAdapter = DashboardListAdapter()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        dashboardBinding =
-            DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
+        dashboardBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_dashboard, container, false)
         dashboardBinding.lifecycleOwner = viewLifecycleOwner
         dashboardBinding.dashboardViewModel = dashboardViewModel
         setupViewsPendingProperties()
         setupUIManagerObserver()
         return dashboardBinding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        dashboardViewModel.checkIfLocalStorageIsEmpty()
     }
 
     private fun setupViewsPendingProperties() {
@@ -47,10 +51,11 @@ class DashboardFragment : Fragment() {
     private fun setupUIManagerObserver() {
         dashboardViewModel.response.observe(viewLifecycleOwner, {
             when (it) {
-                DashboardUIStateManager.Loading -> dashboardBinding.progressBar.visibility =
-                    View.VISIBLE
+                DashboardUIStateManager.Loading -> {
+                    dashboardBinding.progressBar.visibility = View.VISIBLE
+                }
                 is DashboardUIStateManager.Message -> {
-                    Toast.makeText(requireContext(), it.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireActivity(), it.message, Toast.LENGTH_SHORT).show()
                 }
                 is DashboardUIStateManager.Response -> {
                     var visitsCounter = 0

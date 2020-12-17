@@ -3,23 +3,21 @@ package com.mxrampage.fintecimalchallenge.dashboard
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.mxrampage.fintecimalchallenge.R
 import com.mxrampage.fintecimalchallenge.database.PlacesRoomModel
 
 class DashboardListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    private val visitedColor = itemView.resources.getColor(R.color.visited_color)
-    private val nonVisitedColor = itemView.resources.getColor(R.color.non_visited_color)
-
     fun bind(place: PlacesRoomModel, onItemClick: ((PlacesRoomModel) -> Unit)) {
         if (place.isVisited) {
             imageVisitedIndicator.setImageResource(R.drawable.visited_indicator)
             textVisitedIndicator.text = itemView.resources.getString(R.string.visited_text)
-            textVisitedIndicator.setTextColor(visitedColor)
+            textVisitedIndicator.setTextColor(ContextCompat.getColor(itemView.context, R.color.visited_color))
         } else {
             imageVisitedIndicator.setImageResource(R.drawable.non_visited_indicator)
             textVisitedIndicator.text = itemView.resources.getString(R.string.pending_text)
-            textVisitedIndicator.setTextColor(nonVisitedColor)
+            textVisitedIndicator.setTextColor(ContextCompat.getColor(itemView.context, R.color.non_visited_color))
         }
         textStreetName.text = place.entryStreetName
         textSuburbName.text = place.entrySuburb

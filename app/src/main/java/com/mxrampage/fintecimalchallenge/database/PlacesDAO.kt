@@ -12,4 +12,7 @@ interface PlacesDAO {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun savePlacesOnLocalStorage(placesRoomModel: PlacesRoomModel)
+
+    @Update(entity = PlacesRoomModel::class)
+    suspend fun markPlaceAsVisited(placeMarked: PlaceMarked): Int
 }
